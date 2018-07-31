@@ -1,0 +1,64 @@
+--->Spring web MVC框架提供了MVC(模型 - 视图 - 控制器)架构和用于开发灵活和松散耦合的Web应用程序的组件。 MVC模式导致应用程序的不同方面(输入逻辑，业务逻辑和UI逻辑)分离，同时提供这些元素之间的松散耦合。
+
+模型(Model)封装了应用程序数据，通常它们将由POJO类组成。
+视图(View)负责渲染模型数据，一般来说它生成客户端浏览器可以解释HTML输出。
+控制器(Controller)负责处理用户请求并构建适当的模型，并将其传递给视图进行渲染。
+
+--->DispatcherServlet组件类
+
+Spring Web模型 - 视图 - 控制器(MVC)框架是围绕DispatcherServlet设计的，它处理所有的HTTP请求和响应。 Spring Web MVC DispatcherServlet的请求处理工作流如下图所示：
+
+
+
+以下是对应于到DispatcherServlet的传入HTTP请求的事件顺序：
+
+在接收到HTTP请求后，DispatcherServlet会查询HandlerMapping以调用相应的Controller。
+Controller接受请求并根据使用的GET或POST方法调用相应的服务方法。 服务方法将基于定义的业务逻辑设置模型数据，并将视图名称返回给DispatcherServlet。
+DispatcherServlet将从ViewResolver获取请求的定义视图。
+当视图完成，DispatcherServlet将模型数据传递到最终的视图，并在浏览器上呈现。
+所有上述组件，即: HandlerMapping，Controller和ViewResolver是WebApplicationContext的一部分，它是普通ApplicationContext的扩展，带有Web应用程序所需的一些额外功能。
+
+--->HelloWeb DispatcherServlet示例的声明和映射：
+<web-app id="WebApp_ID" version="2.4"
+    xmlns="http://java.sun.com/xml/ns/j2ee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
+    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>Spring MVC Application</display-name>
+
+   <servlet>
+      <servlet-name>HelloWeb</servlet-name>
+      <servlet-class>
+         org.springframework.web.servlet.DispatcherServlet
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>HelloWeb</servlet-name>
+      <url-pattern>*.jsp</url-pattern>
+   </servlet-mapping>
+
+</web-app>
+
+<servlet-mapping>标记指示哪些URL将由DispatcherServlet处理。 这里所有以.jsp结尾的HTTP请求都将由HelloWeb DispatcherServlet处理。
+
+--->定义控制器
+
+DispatcherServlet将请求委派给控制器以执行特定于其的功能。 @Controller注释指示特定类充当控制器的角色。@RequestMapping注释用于将URL映射到整个类或特定处理程序方法。
+
+@Controller
+@RequestMapping("/hello")
+public class HelloController{
+
+   @RequestMapping(method = RequestMethod.GET)
+   public String printHello(ModelMap model) {
+      model.addAttribute("message", "Hello Spring MVC Framework!");
+      return "hello";
+   }
+
+}
+
+@RequestMapping的第一个用法表示此控制器上的所有处理方法都与/hello路径相关。 下一个注释@RequestMapping(method = RequestMethod.GET)用于声明printHello()方法作为控制器的默认服务方法来处理HTTP GET请求。可以定义另一个方法来处理同一URL的任何POST请求。
+
